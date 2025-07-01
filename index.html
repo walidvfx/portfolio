@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Walid Mazzou</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Ajout du dot orange */
+    .orange-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background-color: orange;
+      border-radius: 50%;
+      margin-right: 12px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <nav></nav>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <p><span class="orange-dot"></span> 3 Spots Available
+    </p>
+    <h1>
+      Make every second count <br>
+      <span class="highlight">
+       with <img src="logo1.png" alt="Pro+ Icon" class="inline-icon"> Pro+ edits
+      </span>
+    </h1>
+    <p class="subtext">
+      Effortlessly elevate your visuals with our Pro+ editing template,<br> 
+      designed for creators and agencies
+    </p>
+    <div class="customers">
+      <img src="client4.jpg" alt="Customer" class="avatar" />
+      <img src="client1.jpg" alt="Customer" class="avatar" />
+      <span>15+ Happy customers</span>
+    </div>
+    <div class="video-section">
+      <video controls width="560" height="315">
+        <source src="video1.mp4" type="video/mp4">
+      </video>
+    </div>
+  </section>
+
+  <!-- Work Section -->
+  <section class="work-section">
+    <p class="section-label">
+    <span class="orange-dot"></span>
+      Work
+    </p>
+    <h2 class="section-title">
+      Explore our video editing <br> work and projects
+    </h2>
+   <div class="slider-container">
+  <button class="slider-btn right" id="rightBtn" onclick="scrollSlider(1)">&#10095;</button>
+  <button class="slider-btn left" id="leftBtn" onclick="scrollSlider(-1)">&#10094;</button>
+
+  <div class="slider-track" id="workSlider">
+     <div class="work-card">
+      <video autoplay muted loop playsinline>
+        <source src="best.mp4" type="video/mp4" />
+      </video>
+    </div>
+    <div class="work-card">
+      <video autoplay muted loop playsinline>
+        <source src="simostep.mp4" type="video/mp4" />
+      </video>
+    </div>
+
+    <div class="work-card">
+      <video autoplay muted loop playsinline>
+        <source src="v3.mp4" type="video/mp4" />
+      </video>
+    </div>
+  </div>
+</div>
+
+  </section>
+
+  <!-- Services Section -->
+  <section class="services-section">
+    <p class="section-label">
+      <span class="orange-dot"></span>
+      Services
+    </p>
+    <h2 class="section-title">
+  
+      Explore our professional video <br> editing services
+    </h2>
+    <div class="services-grid">
+      <div class="service-card">
+        <img src="logins.png" alt="Instagram Reels" class="service-icon">
+        <h3>Instagram Reels</h3>
+        <p>Create and track budgets for various categories like transportation</p>
+      </div>
+      <div class="service-card">
+        <img src="logoyt.png" alt="YouTube Videos" class="service-icon">
+        <h3>YouTube Videos</h3>
+        <p>Edit high-quality videos with customized effects and transitions.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section">
+    <p class="section-label">
+    <span class="orange-dot"></span>
+      Features
+    </p>
+    <h2 class="section-title">
+      Key features of our video <br> editing process
+    </h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <img src="low.png" alt="Video Editing" class="feature-icon" />
+        <h3>Video Editing</h3>
+        <p>Edit videos with a range of effects, transitions, and color grading</p>
+      </div>
+      <div class="feature-card">
+        <img src="tan.png" alt="Client Reporting" class="feature-icon" />
+        <h3>Client Reporting</h3>
+        <p>Provide detailed performance reports and analytics to clients project</p>
+      </div>
+      <div class="feature-card">
+        <img src="stra.png" alt="Content Strategy" class="feature-icon" />
+        <h3>Content Strategy</h3>
+        <p>Develop effective content to boost engagement and drive results</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="contact">
+  <h2>Contact Us</h2>
+  <div class="social-links">
+    <a href="https://www.instagram.com/walidvfx_?igsh=ZGhkbjdjamxyc3Js&utm_source=qr" aria-label="Instagram" target="_blank" rel="noopener noreferrer">
+      Dm me
+    </a>
+  </div>
+  <p>&copy; 2025 WALIDFVX - Tous droits réservés.</p>
+</footer>
+<script src="script.js"></script>
+</body>
+</html
