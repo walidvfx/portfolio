@@ -1,4 +1,4 @@
-// Video Slider JavaScript - Version corrigée
+// Video Slider JavaScript
 document.addEventListener('DOMContentLoaded', function() {
     const sliderTrack = document.querySelector('.slider-track');
     const leftBtn = document.querySelector('.slider-btn.left');
@@ -9,99 +9,105 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentSlide = 0;
     const totalSlides = videos.length;
     
-    // Vérifier si les éléments existent avant d'initialiser
-    if (!sliderTrack || totalSlides === 0) {
-        console.warn('Slider elements not found or no videos available');
-        return;
-    }
-    
-    // Initialiser le slider
+    // Initialize: Hide left button, show right button
     function initializeSlider() {
-        updateButtonVisibility();
+        leftBtn.style.display = 'none';
+        rightBtn.style.display = 'flex';
         updateSliderPosition();
         updateIndicators();
         pauseAllVideos();
         playCurrentVideo();
     }
     
-    // Mettre à jour la position du slider
+    // Update slider position
     function updateSliderPosition() {
         const translateX = -currentSlide * 100;
+
         sliderTrack.style.transform = `translateX(${translateX}%)`;
     }
     
-    // Mettre à jour la visibilité des boutons
+    // Update button visibility
     function updateButtonVisibility() {
-        if (leftBtn) {
-            leftBtn.style.display = currentSlide === 0 ? 'none' : 'flex';
+        // Show/hide left button
+        if (currentSlide === 0) {
+            leftBtn.style.display = 'none';
+        } else {
+            leftBtn.style.display = 'flex';
         }
         
-        if (rightBtn) {
-            rightBtn.style.display = currentSlide === totalSlides - 1 ? 'none' : 'flex';
+        // Show/hide right button
+        if (currentSlide === totalSlides - 1) {
+            rightBtn.style.display = 'none';
+        } else {
+            rightBtn.style.display = 'flex';
         }
     }
     
-    // Mettre à jour les indicateurs
+    // Update indicators
     function updateIndicators() {
         indicators.forEach((dot, index) => {
-            dot.classList.toggle('active', index === currentSlide);
-        });
-    }
-    
-    // Mettre en pause toutes les vidéos
-    function pauseAllVideos() {
-        videos.forEach(video => {
-            if (video) {
-                video.pause();
-                video.currentTime = 0;
+            if (index === currentSlide) {
+                dot.classList.add('active');
+            } else {
+                dot.classList.remove('active');
             }
         });
     }
     
-    // Lire la vidéo actuelle
+    // Pause all videos
+    function pauseAllVideos() {
+        videos.forEach(video => {
+            video.pause();
+            video.currentTime = 0;
+        });
+    }
+    
+    // Play current video
     function playCurrentVideo() {
-        const currentVideo = videos[currentSlide];
-        if (currentVideo) {
-            currentVideo.play().catch(e => {
+        if (videos[currentSlide]) {
+            videos[currentSlide].play().catch(e => {
                 console.log('Video autoplay prevented:', e);
             });
         }
     }
     
-    // Aller au slide suivant
+    // Move to next slide
     function nextSlide() {
         if (currentSlide < totalSlides - 1) {
             currentSlide++;
-            updateSlide();
+            updateSliderPosition();
+            updateButtonVisibility();
+            updateIndicators();
+            pauseAllVideos();
+            playCurrentVideo();
         }
     }
     
-    // Aller au slide précédent
+    // Move to previous slide
     function prevSlide() {
         if (currentSlide > 0) {
             currentSlide--;
-            updateSlide();
+            updateSliderPosition();
+            updateButtonVisibility();
+            updateIndicators();
+            pauseAllVideos();
+            playCurrentVideo();
         }
     }
     
-    // Aller à un slide spécifique
+    // Go to specific slide
     function goToSlide(slideIndex) {
-        if (slideIndex >= 0 && slideIndex < totalSlides && slideIndex !== currentSlide) {
+        if (slideIndex >= 0 && slideIndex < totalSlides) {
             currentSlide = slideIndex;
-            updateSlide();
+            updateSliderPosition();
+            updateButtonVisibility();
+            updateIndicators();
+            pauseAllVideos();
+            playCurrentVideo();
         }
     }
     
-    // Fonction centralisée pour mettre à jour le slide
-    function updateSlide() {
-        updateSliderPosition();
-        updateButtonVisibility();
-        updateIndicators();
-        pauseAllVideos();
-        playCurrentVideo();
-    }
-    
-    // Event listeners pour les boutons de navigation
+    // Event listeners for arrow buttons
     if (rightBtn) {
         rightBtn.addEventListener('click', nextSlide);
     }
@@ -110,90 +116,57 @@ document.addEventListener('DOMContentLoaded', function() {
         leftBtn.addEventListener('click', prevSlide);
     }
     
-    // Event listeners pour les indicateurs
+    // Event listeners for indicators
     indicators.forEach((dot, index) => {
         dot.addEventListener('click', () => {
             goToSlide(index);
         });
     });
     
-    // Navigation au clavier
+    // Keyboard navigation
     document.addEventListener('keydown', function(e) {
-        switch(e.key) {
-            case 'ArrowRight':
-                e.preventDefault();
-                nextSlide();
-                break;
-            case 'ArrowLeft':
-                e.preventDefault();
-                prevSlide();
-                break;
+        if (e.key === 'ArrowRight') {
+            nextSlide();
+        } else if (e.key === 'ArrowLeft') {
+            prevSlide();
         }
     });
     
-    // Support tactile/swipe pour mobile
+    // Touch/swipe support for mobile
     let startX = null;
-    let startY = null;
-    let isScrolling = false;
+    let currentX = null;
     
     sliderTrack.addEventListener('touchstart', function(e) {
         startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-        isScrolling = false;
-    }, { passive: true });
+    });
     
     sliderTrack.addEventListener('touchmove', function(e) {
-        if (!startX || !startY) return;
-        
-        const currentX = e.touches[0].clientX;
-        const currentY = e.touches[0].clientY;
-        const diffX = Math.abs(startX - currentX);
-        const diffY = Math.abs(startY - currentY);
-        
-        // Déterminer si c'est un scroll vertical
-        if (diffY > diffX) {
-            isScrolling = true;
-        }
-        
-        // Empêcher le scroll horizontal si c'est un swipe
-        if (!isScrolling && diffX > 10) {
-            e.preventDefault();
-        }
+        currentX = e.touches[0].clientX;
     });
     
     sliderTrack.addEventListener('touchend', function(e) {
-        if (!startX || isScrolling) {
-            resetTouch();
-            return;
-        }
+        if (!startX || !currentX) return;
         
-        const endX = e.changedTouches[0].clientX;
-        const diffX = startX - endX;
-        const threshold = 50; // Distance minimale pour un swipe
+        const diffX = startX - currentX;
+        const threshold = 50; // minimum swipe distance
         
         if (Math.abs(diffX) > threshold) {
             if (diffX > 0) {
-                // Swipe vers la gauche - slide suivant
+                // Swipe left - next slide
                 nextSlide();
             } else {
-                // Swipe vers la droite - slide précédent
+                // Swipe right - previous slide
                 prevSlide();
             }
         }
         
-        resetTouch();
-    }, { passive: true });
-    
-    function resetTouch() {
         startX = null;
-        startY = null;
-        isScrolling = false;
-    }
+        currentX = null;
+    });
     
-    // Observer d'intersection pour les vidéos
+    // Auto-pause videos when they're not visible
     const observerOptions = {
-        threshold: 0.5,
-        rootMargin: '0px'
+        threshold: 0.5
     };
     
     const videoObserver = new IntersectionObserver((entries) => {
@@ -205,70 +178,33 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, observerOptions);
     
-    // Observer toutes les vidéos
+    // Observe all videos
     videos.forEach(video => {
-        if (video) {
-            videoObserver.observe(video);
-        }
+        videoObserver.observe(video);
     });
     
-    // Fonction de nettoyage
-    function cleanup() {
-        videoObserver.disconnect();
-        pauseAllVideos();
-    }
-    
-    // Nettoyage lors du déchargement de la page
-    window.addEventListener('beforeunload', cleanup);
-    
-    // Initialiser le slider
+    // Initialize the slider
     initializeSlider();
     
-    // Auto-advance optionnel (décommentez pour activer)
+    // Optional: Auto-advance slides (uncomment to enable)
     /*
-    let autoAdvanceInterval;
-    
-    function startAutoAdvance() {
-        autoAdvanceInterval = setInterval(() => {
-            if (currentSlide < totalSlides - 1) {
-                nextSlide();
-            } else {
-                goToSlide(0); // Retour au début
-            }
-        }, 5000); // Changer de slide toutes les 5 secondes
-    }
-    
-    function stopAutoAdvance() {
-        if (autoAdvanceInterval) {
-            clearInterval(autoAdvanceInterval);
-            autoAdvanceInterval = null;
+    setInterval(() => {
+        if (currentSlide < totalSlides - 1) {
+            nextSlide();
+        } else {
+            currentSlide = -1; // Will be incremented to 0
+            nextSlide();
         }
-    }
-    
-    // Démarrer l'auto-advance
-    startAutoAdvance();
-    
-    // Arrêter l'auto-advance sur interaction utilisateur
-    [leftBtn, rightBtn, ...indicators].forEach(element => {
-        if (element) {
-            element.addEventListener('click', () => {
-                stopAutoAdvance();
-                // Optionnel : redémarrer après un délai
-                setTimeout(startAutoAdvance, 10000);
-            });
-        }
-    });
+    }, 5000); // Change slide every 5 seconds
     */
 });
 
-// CSS pour les flèches orange (à ajouter dans votre fichier CSS)
+// CSS for orange arrows (add this to your CSS file)
 const orangeArrowStyles = `
 .slider-btn {
     background-color: rgba(255, 165, 0, 0.8) !important;
     color: white !important;
     border: 2px solid #ff8c00 !important;
-    transition: all 0.3s ease !important;
-    cursor: pointer !important;
 }
 
 .slider-btn:hover {
@@ -276,29 +212,16 @@ const orangeArrowStyles = `
     transform: translateY(-50%) scale(1.1) !important;
 }
 
-.slider-btn:active {
-    transform: translateY(-50%) scale(0.95) !important;
+.slider-btn.left {
+    display: none;
 }
 
-.slider-btn:disabled {
-    opacity: 0.5 !important;
-    cursor: not-allowed !important;
-}
-
-.dot {
-    cursor: pointer !important;
-    transition: all 0.3s ease !important;
-}
-
-.dot.active {
-    background-color: #ff8c00 !important;
+.slider-btn.right {
+    display: flex;
 }
 `;
 
-// Injecter les styles des flèches orange
-if (!document.querySelector('#slider-styles')) {
-    const styleSheet = document.createElement('style');
-    styleSheet.id = 'slider-styles';
-    styleSheet.textContent = orangeArrowStyles;
-    document.head.appendChild(styleSheet);
-}
+// Inject orange arrow styles
+const styleSheet = document.createElement('style');
+styleSheet.textContent = orangeArrowStyles;
+document.head.appendChild(styleSheet);
