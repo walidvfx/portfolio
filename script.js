@@ -1,4 +1,4 @@
-// Video Slider JavaScript
+// Video Slider JavaScript - Version corrigée
 document.addEventListener('DOMContentLoaded', function() {
     const sliderTrack = document.querySelector('.slider-track');
     const leftBtn = document.querySelector('.slider-btn.left');
@@ -9,103 +9,99 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentSlide = 0;
     const totalSlides = videos.length;
     
-    // Initialize: Hide left button, show right button
+    // Vérifier si les éléments existent avant d'initialiser
+    if (!sliderTrack || totalSlides === 0) {
+        console.warn('Slider elements not found or no videos available');
+        return;
+    }
+    
+    // Initialiser le slider
     function initializeSlider() {
-        leftBtn.style.display = 'none';
-        rightBtn.style.display = 'flex';
+        updateButtonVisibility();
         updateSliderPosition();
         updateIndicators();
         pauseAllVideos();
         playCurrentVideo();
     }
     
-    // Update slider position
+    // Mettre à jour la position du slider
     function updateSliderPosition() {
         const translateX = -currentSlide * 100;
+        sliderTrack.style.transform = `translateX(${translateX}%)`;
     }
     
-    // Update button visibility
+    // Mettre à jour la visibilité des boutons
     function updateButtonVisibility() {
-        // Show/hide left button
-        if (currentSlide === 0) {
-            leftBtn.style.display = 'none';
-        } else {
-            leftBtn.style.display = 'flex';
+        if (leftBtn) {
+            leftBtn.style.display = currentSlide === 0 ? 'none' : 'flex';
         }
         
-        // Show/hide right button
-        if (currentSlide === totalSlides - 1) {
-            rightBtn.style.display = 'none';
-        } else {
-            rightBtn.style.display = 'flex';
+        if (rightBtn) {
+            rightBtn.style.display = currentSlide === totalSlides - 1 ? 'none' : 'flex';
         }
     }
     
-    // Update indicators
+    // Mettre à jour les indicateurs
     function updateIndicators() {
         indicators.forEach((dot, index) => {
-            if (index === currentSlide) {
-                dot.classList.add('active');
-            } else {
-                dot.classList.remove('active');
+            dot.classList.toggle('active', index === currentSlide);
+        });
+    }
+    
+    // Mettre en pause toutes les vidéos
+    function pauseAllVideos() {
+        videos.forEach(video => {
+            if (video) {
+                video.pause();
+                video.currentTime = 0;
             }
         });
     }
     
-    // Pause all videos
-    function pauseAllVideos() {
-        videos.forEach(video => {
-            video.pause();
-            video.currentTime = 0;
-        });
-    }
-    
-    // Play current video
+    // Lire la vidéo actuelle
     function playCurrentVideo() {
-        if (videos[currentSlide]) {
-            videos[currentSlide].play().catch(e => {
+        const currentVideo = videos[currentSlide];
+        if (currentVideo) {
+            currentVideo.play().catch(e => {
                 console.log('Video autoplay prevented:', e);
             });
         }
     }
     
-    // Move to next slide
+    // Aller au slide suivant
     function nextSlide() {
         if (currentSlide < totalSlides - 1) {
             currentSlide++;
-            updateSliderPosition();
-            updateButtonVisibility();
-            updateIndicators();
-            pauseAllVideos();
-            playCurrentVideo();
+            updateSlide();
         }
     }
     
-    // Move to previous slide
+    // Aller au slide précédent
     function prevSlide() {
         if (currentSlide > 0) {
             currentSlide--;
-            updateSliderPosition();
-            updateButtonVisibility();
-            updateIndicators();
-            pauseAllVideos();
-            playCurrentVideo();
+            updateSlide();
         }
     }
     
-    // Go to specific slide
+    // Aller à un slide spécifique
     function goToSlide(slideIndex) {
-        if (slideIndex >= 0 && slideIndex < totalSlides) {
+        if (slideIndex >= 0 && slideIndex < totalSlides && slideIndex !== currentSlide) {
             currentSlide = slideIndex;
-            updateSliderPosition();
-            updateButtonVisibility();
-            updateIndicators();
-            pauseAllVideos();
-            playCurrentVideo();
+            updateSlide();
         }
     }
     
-    // Event listeners for arrow buttons
+    // Fonction centralisée pour mettre à jour le slide
+    function updateSlide() {
+        updateSliderPosition();
+        updateButtonVisibility();
+        updateIndicators();
+        pauseAllVideos();
+        playCurrentVideo();
+    }
+    
+    // Event listeners pour les boutons de navigation
     if (rightBtn) {
         rightBtn.addEventListener('click', nextSlide);
     }
@@ -114,57 +110,90 @@ document.addEventListener('DOMContentLoaded', function() {
         leftBtn.addEventListener('click', prevSlide);
     }
     
-    // Event listeners for indicators
+    // Event listeners pour les indicateurs
     indicators.forEach((dot, index) => {
         dot.addEventListener('click', () => {
             goToSlide(index);
         });
     });
     
-    // Keyboard navigation
+    // Navigation au clavier
     document.addEventListener('keydown', function(e) {
-        if (e.key === 'ArrowRight') {
-            nextSlide();
-        } else if (e.key === 'ArrowLeft') {
-            prevSlide();
+        switch(e.key) {
+            case 'ArrowRight':
+                e.preventDefault();
+                nextSlide();
+                break;
+            case 'ArrowLeft':
+                e.preventDefault();
+                prevSlide();
+                break;
         }
     });
     
-    // Touch/swipe support for mobile
+    // Support tactile/swipe pour mobile
     let startX = null;
-    let currentX = null;
+    let startY = null;
+    let isScrolling = false;
     
     sliderTrack.addEventListener('touchstart', function(e) {
         startX = e.touches[0].clientX;
-    });
+        startY = e.touches[0].clientY;
+        isScrolling = false;
+    }, { passive: true });
     
     sliderTrack.addEventListener('touchmove', function(e) {
-        currentX = e.touches[0].clientX;
+        if (!startX || !startY) return;
+        
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const diffX = Math.abs(startX - currentX);
+        const diffY = Math.abs(startY - currentY);
+        
+        // Déterminer si c'est un scroll vertical
+        if (diffY > diffX) {
+            isScrolling = true;
+        }
+        
+        // Empêcher le scroll horizontal si c'est un swipe
+        if (!isScrolling && diffX > 10) {
+            e.preventDefault();
+        }
     });
     
     sliderTrack.addEventListener('touchend', function(e) {
-        if (!startX || !currentX) return;
+        if (!startX || isScrolling) {
+            resetTouch();
+            return;
+        }
         
-        const diffX = startX - currentX;
-        const threshold = 50; // minimum swipe distance
+        const endX = e.changedTouches[0].clientX;
+        const diffX = startX - endX;
+        const threshold = 50; // Distance minimale pour un swipe
         
         if (Math.abs(diffX) > threshold) {
             if (diffX > 0) {
-                // Swipe left - next slide
+                // Swipe vers la gauche - slide suivant
                 nextSlide();
             } else {
-                // Swipe right - previous slide
+                // Swipe vers la droite - slide précédent
                 prevSlide();
             }
         }
         
-        startX = null;
-        currentX = null;
-    });
+        resetTouch();
+    }, { passive: true });
     
-    // Auto-pause videos when they're not visible
+    function resetTouch() {
+        startX = null;
+        startY = null;
+        isScrolling = false;
+    }
+    
+    // Observer d'intersection pour les vidéos
     const observerOptions = {
-        threshold: 0.5
+        threshold: 0.5,
+        rootMargin: '0px'
     };
     
     const videoObserver = new IntersectionObserver((entries) => {
@@ -176,33 +205,70 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }, observerOptions);
     
-    // Observe all videos
+    // Observer toutes les vidéos
     videos.forEach(video => {
-        videoObserver.observe(video);
+        if (video) {
+            videoObserver.observe(video);
+        }
     });
     
-    // Initialize the slider
+    // Fonction de nettoyage
+    function cleanup() {
+        videoObserver.disconnect();
+        pauseAllVideos();
+    }
+    
+    // Nettoyage lors du déchargement de la page
+    window.addEventListener('beforeunload', cleanup);
+    
+    // Initialiser le slider
     initializeSlider();
     
-    // Optional: Auto-advance slides (uncomment to enable)
+    // Auto-advance optionnel (décommentez pour activer)
     /*
-    setInterval(() => {
-        if (currentSlide < totalSlides - 1) {
-            nextSlide();
-        } else {
-            currentSlide = -1; // Will be incremented to 0
-            nextSlide();
+    let autoAdvanceInterval;
+    
+    function startAutoAdvance() {
+        autoAdvanceInterval = setInterval(() => {
+            if (currentSlide < totalSlides - 1) {
+                nextSlide();
+            } else {
+                goToSlide(0); // Retour au début
+            }
+        }, 5000); // Changer de slide toutes les 5 secondes
+    }
+    
+    function stopAutoAdvance() {
+        if (autoAdvanceInterval) {
+            clearInterval(autoAdvanceInterval);
+            autoAdvanceInterval = null;
         }
-    }, 5000); // Change slide every 5 seconds
+    }
+    
+    // Démarrer l'auto-advance
+    startAutoAdvance();
+    
+    // Arrêter l'auto-advance sur interaction utilisateur
+    [leftBtn, rightBtn, ...indicators].forEach(element => {
+        if (element) {
+            element.addEventListener('click', () => {
+                stopAutoAdvance();
+                // Optionnel : redémarrer après un délai
+                setTimeout(startAutoAdvance, 10000);
+            });
+        }
+    });
     */
 });
 
-// CSS for orange arrows (add this to your CSS file)
+// CSS pour les flèches orange (à ajouter dans votre fichier CSS)
 const orangeArrowStyles = `
 .slider-btn {
     background-color: rgba(255, 165, 0, 0.8) !important;
     color: white !important;
     border: 2px solid #ff8c00 !important;
+    transition: all 0.3s ease !important;
+    cursor: pointer !important;
 }
 
 .slider-btn:hover {
@@ -210,16 +276,29 @@ const orangeArrowStyles = `
     transform: translateY(-50%) scale(1.1) !important;
 }
 
-.slider-btn.left {
-    display: none;
+.slider-btn:active {
+    transform: translateY(-50%) scale(0.95) !important;
 }
 
-.slider-btn.right {
-    display: flex;
+.slider-btn:disabled {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+}
+
+.dot {
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+}
+
+.dot.active {
+    background-color: #ff8c00 !important;
 }
 `;
 
-// Inject orange arrow styles
-const styleSheet = document.createElement('style');
-styleSheet.textContent = orangeArrowStyles;
-document.head.appendChild(styleSheet);
+// Injecter les styles des flèches orange
+if (!document.querySelector('#slider-styles')) {
+    const styleSheet = document.createElement('style');
+    styleSheet.id = 'slider-styles';
+    styleSheet.textContent = orangeArrowStyles;
+    document.head.appendChild(styleSheet);
+}
