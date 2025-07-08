@@ -572,4 +572,14 @@ footer p {
     height: 40px;
     font-size: 14px;
   }
+  .slider-track {
+  display: flex;
+  transition: transform 0.5s ease;
+  width: max-content; /* يخلي الطول على قد الفيديوهات */
+}
+
+.work-card {
+  flex: 0 0 100%; /* كل كارد تاخد 100% من العرض */
+}
+
 }
