@@ -21,8 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Update slider position
     function updateSliderPosition() {
-        const translateX = -currentSlide * 100;
-
+        const translateX = -currentSlide * (100 / totalSlides);
         sliderTrack.style.transform = `translateX(${translateX}%)`;
     }
     
