@@ -6,27 +6,14 @@
   <title>Walid Mazzou</title>
   <link rel="stylesheet" href="style.css" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    /* Ajout du dot orange */
-    .orange-dot {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      background-color: orange;
-      border-radius: 50%;
-      margin-right: 12px;
-      vertical-align: middle;
-    }
-  </style>
   <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-LT2JZLNJP0"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-LT2JZLNJP0');
-</script>
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LT2JZLNJP0"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-LT2JZLNJP0');
+  </script>
 </head>
 <body>
 
@@ -52,8 +39,8 @@
         designed for creators and agencies
       </p>
       <div class="customers">
-        <img src="client4.jpg" alt="Customer 1" class="avatar" />
-        <img src="client1.jpg" alt="Customer 2" class="avatar" />
+        <img src="client4.jpg" alt="Customer 1" />
+        <img src="client1.jpg" alt="Customer 2" />
         <span>15+ Happy customers</span>
       </div>
       <div class="video-section">
@@ -74,10 +61,11 @@
       </h2>
 
       <div class="slider-container">
-        <button class="slider-btn right" id="rightBtn" onclick="scrollSlider(1)">&#10095;</button>
-        <button class="slider-btn left" id="leftBtn" onclick="scrollSlider(-1)">&#10094;</button>
+        <button class="slider-btn left" id="leftBtn">&#10094;</button>
+        <button class="slider-btn right" id="rightBtn">&#10095;</button>
 
         <div class="slider-track" id="workSlider">
+          <!-- Ajoute autant de vidéos que tu veux ici -->
           <div class="work-card">
             <video autoplay muted loop playsinline controls>
               <source src="best.mp4" type="video/mp4" />
@@ -93,8 +81,17 @@
               <source src="v3.mp4" type="video/mp4" />
             </video>
           </div>
+          <!-- Tu peux ajouter plus de vidéos ici -->
+          <!-- <div class="work-card">
+            <video autoplay muted loop playsinline controls>
+              <source src="video4.mp4" type="video/mp4" />
+            </video>
+          </div> -->
         </div>
       </div>
+      
+      <!-- Indicateurs dynamiques -->
+      <div class="indicators" id="indicators"></div>
     </section>
 
     <!-- Services Section -->
@@ -161,4 +158,3 @@
   <script src="script.js"></script>
 </body>
 </html>
-
