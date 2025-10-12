@@ -3,68 +3,75 @@ document.addEventListener('DOMContentLoaded', function() {
     const sliderTrack = document.querySelector('.slider-track');
     const leftBtn = document.querySelector('.slider-btn.left');
     const rightBtn = document.querySelector('.slider-btn.right');
-    const videos = document.querySelectorAll('.work-card video');
-    const indicators = document.querySelectorAll('.dot');
+    const workCards = document.querySelectorAll('.work-card');
+    const indicatorsContainer = document.getElementById('indicators');
     
     let currentSlide = 0;
-    const totalSlides = videos.length;
+    const totalSlides = workCards.length;
+    
+    // Créer les indicateurs dynamiquement
+    function createIndicators() {
+        indicatorsContainer.innerHTML = '';
+        for (let i = 0; i < totalSlides; i++) {
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            if (i === 0) dot.classList.add('active');
+            dot.addEventListener('click', () => goToSlide(i));
+            indicatorsContainer.appendChild(dot);
+        }
+    }
     
     // Initialize: Hide left button, show right button
     function initializeSlider() {
+        createIndicators();
         leftBtn.style.display = 'none';
-        rightBtn.style.display = 'flex';
+        if (totalSlides <= 1) {
+            rightBtn.style.display = 'none';
+        } else {
+            rightBtn.style.display = 'flex';
+        }
         updateSliderPosition();
-        updateIndicators();
         pauseAllVideos();
         playCurrentVideo();
     }
     
     // Update slider position
     function updateSliderPosition() {
-        const translateX = -currentSlide * (100 / totalSlides);
+        const translateX = -currentSlide * 100;
         sliderTrack.style.transform = `translateX(${translateX}%)`;
     }
     
     // Update button visibility
     function updateButtonVisibility() {
-        // Show/hide left button
-        if (currentSlide === 0) {
-            leftBtn.style.display = 'none';
-        } else {
-            leftBtn.style.display = 'flex';
-        }
-        
-        // Show/hide right button
-        if (currentSlide === totalSlides - 1) {
-            rightBtn.style.display = 'none';
-        } else {
-            rightBtn.style.display = 'flex';
-        }
+        leftBtn.style.display = currentSlide === 0 ? 'none' : 'flex';
+        rightBtn.style.display = currentSlide === totalSlides - 1 ? 'none' : 'flex';
     }
     
     // Update indicators
     function updateIndicators() {
-        indicators.forEach((dot, index) => {
-            if (index === currentSlide) {
-                dot.classList.add('active');
-            } else {
-                dot.classList.remove('active');
-            }
+        const dots = indicatorsContainer.querySelectorAll('.dot');
+        dots.forEach((dot, index) => {
+            dot.classList.toggle('active', index === currentSlide);
         });
     }
     
     // Pause all videos
     function pauseAllVideos() {
-        videos.forEach(video => {
-            video.pause();
-            video.currentTime = 0;
+        workCards.forEach(card => {
+            const video = card.querySelector('video');
+            if (video) {
+                video.pause();
+                video.currentTime = 0;
+            }
         });
     }
     
     // Play current video
     function playCurrentVideo() {
-        if (videos[currentSlide]) {
-            videos[currentSlide].play().catch(e => {
+        const currentCard = workCards[currentSlide];
+        const video = currentCard.querySelector('video');
+        if (video) {
+            video.play().catch(e => {
                 console.log('Video autoplay prevented:', e);
             });
         }
@@ -107,20 +114,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Event listeners for arrow buttons
-    if (rightBtn) {
-        rightBtn.addEventListener('click', nextSlide);
-    }
-    
-    if (leftBtn) {
-        leftBtn.addEventListener('click', prevSlide);
-    }
-    
-    // Event listeners for indicators
-    indicators.forEach((dot, index) => {
-        dot.addEventListener('click', () => {
-            goToSlide(index);
-        });
-    });
+    rightBtn.addEventListener('click', nextSlide);
+    leftBtn.addEventListener('click', prevSlide);
     
     // Keyboard navigation
     document.addEventListener('keydown', function(e) {
@@ -133,20 +128,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Touch/swipe support for mobile
     let startX = null;
-    let currentX = null;
     
     sliderTrack.addEventListener('touchstart', function(e) {
         startX = e.touches[0].clientX;
     });
     
-    sliderTrack.addEventListener('touchmove', function(e) {
-        currentX = e.touches[0].clientX;
-    });
-    
     sliderTrack.addEventListener('touchend', function(e) {
-        if (!startX || !currentX) return;
+        if (!startX) return;
         
-        const diffX = startX - currentX;
+        const endX = e.changedTouches[0].clientX;
+        const diffX = startX - endX;
         const threshold = 50; // minimum swipe distance
         
         if (Math.abs(diffX) > threshold) {
@@ -160,7 +151,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         startX = null;
-        currentX = null;
     });
     
     // Auto-pause videos when they're not visible
@@ -178,8 +168,11 @@ document.addEventListener('DOMContentLoaded', function() {
     }, observerOptions);
     
     // Observe all videos
-    videos.forEach(video => {
-        videoObserver.observe(video);
+    workCards.forEach(card => {
+        const video = card.querySelector('video');
+        if (video) {
+            videoObserver.observe(video);
+        }
     });
     
     // Initialize the slider
@@ -197,30 +190,3 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 5000); // Change slide every 5 seconds
     */
 });
-
-// CSS for orange arrows (add this to your CSS file)
-const orangeArrowStyles = `
-.slider-btn {
-    background-color: rgba(255, 165, 0, 0.8) !important;
-    color: white !important;
-    border: 2px solid #ff8c00 !important;
-}
-
-.slider-btn:hover {
-    background-color: rgba(255, 140, 0, 0.9) !important;
-    transform: translateY(-50%) scale(1.1) !important;
-}
-
-.slider-btn.left {
-    display: none;
-}
-
-.slider-btn.right {
-    display: flex;
-}
-`;
-
-// Inject orange arrow styles
-const styleSheet = document.createElement('style');
-styleSheet.textContent = orangeArrowStyles;
-document.head.appendChild(styleSheet);
